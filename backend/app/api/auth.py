@@ -7,10 +7,12 @@ from backend.app.security.password_hash import encrypter
 from fastapi.security import OAuth2PasswordRequestForm
 
 
-auth_router = APIRouter(prefix="/auth", tags= ["auth"])
+auth_router = APIRouter(prefix="/api", tags= ["auth"])
 
-@auth_router.post("/create-user")
-async def create_user_account(user_data: NewAccountSchema, session: Session = Depends(get_session_db)):
+@auth_router.post("/auth/create-user")
+async def create_user_account(user_data: NewAccountSchema, session: Session = Depends(get_session_db), user_req: User = Depends(verify_token)):
+    if user_req.admin == False:
+        raise HTTPException(status_code=401, detail="apenas usuarios admin podem criar novas contas")
     flag_user: bool = bool(session.query(User).filter(User.email == user_data.email).first())
     if flag_user:
         raise HTTPException(status_code=401, detail="email já existe")
@@ -25,7 +27,7 @@ async def create_user_account(user_data: NewAccountSchema, session: Session = De
     }
 
 
-@auth_router.post("/login")
+@auth_router.post("/auth/login")
 async def login(user_data = Depends(OAuth2PasswordRequestForm), session: Session = Depends(get_session_db)):
     ptr_user = session.query(User).filter(User.email == user_data.username).first()
     if not ptr_user:
@@ -41,7 +43,7 @@ async def login(user_data = Depends(OAuth2PasswordRequestForm), session: Session
     
     
 
-@auth_router.post("/login-teste") # OBS: Para tester de rotas protegidas. Use requests
+@auth_router.post("/auth/login-teste") # OBS: Para tester de rotas protegidas. Use requests
 async def login(user_data: LoginSchema, session: Session = Depends(get_session_db)):
     ptr_user = session.query(User).filter(User.email == user_data.email).first()
     if not ptr_user:
@@ -54,3 +56,23 @@ async def login(user_data: LoginSchema, session: Session = Depends(get_session_d
         "access_token": access_token,
         "token-type": "Bearer"
     }
+@auth_router.post("/auth/set-admin")
+async def set_admin_account(user_id: int, adm: bool, session: Session = Depends(get_session_db), user_req: User = Depends(verify_token)):
+    if user_req.admin == False:
+        raise HTTPException(status_code=401, detail=f"usuario {user_req.name} não autorizado")
+    user = session.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="usuario nao encontrado")
+    if adm:
+        user.admin = True
+        session.commit()
+        return{
+            "warning": f"Usuario {user.name} agora é um administrador"
+        }
+    if not adm:
+        user.admin = False
+        session.commit()
+        return{
+            "warning": f"Usuario {user.name} não é mais um administrador"
+        }
+    

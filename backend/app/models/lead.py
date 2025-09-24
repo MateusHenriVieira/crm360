@@ -1,6 +1,6 @@
 from backend.app.models.db import Base
 from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey, DateTime, LargeBinary
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from fastapi import Response
 
 
@@ -28,6 +28,11 @@ class Lead(Base):
         this.score = score
         this.source = source
         this.avatar = avatar
+
+    def update_time(this):
+        utc_br = timezone(timedelta(hours=-3))
+        this.updated_at = datetime.now(utc_br)
+        return
         
     def get_img_response(this, media_type: str = "image/png"):
         if not this.avatar:
