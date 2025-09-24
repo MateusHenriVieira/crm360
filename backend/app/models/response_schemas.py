@@ -17,4 +17,3 @@ class ResponseLead(BaseModel):
     avatar: Optional[bytes]
     class Config:
         from_attributes = True
-        orm_mode = True
