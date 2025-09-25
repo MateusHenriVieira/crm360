@@ -45,21 +45,6 @@ async def login(user_data = Depends(OAuth2PasswordRequestForm), session: Session
         "token-type": "Bearer"
     }
     
-    
-
-@auth_router.post("/auth/login-teste") # OBS: Para tester de rotas protegidas. Use requests
-async def login(user_data: LoginSchema, session: Session = Depends(get_session_db)):
-    ptr_user = session.query(User).filter(User.email == user_data.email).first()
-    if not ptr_user:
-        raise HTTPException(status_code=404, detail="usuario não encontrado")
-    flag_password = encrypter.verify(user_data.password, ptr_user.password)
-    if not flag_password:
-        raise HTTPException(status_code=401, detail="credenciais invalidas")
-    access_token = make_token(ptr_user)
-    return{
-        "access_token": access_token,
-        "token-type": "Bearer"
-    }
 @auth_router.post("/auth/set-admin")
 async def set_admin_account(user_id: int, adm: bool, session: Session = Depends(get_session_db), user_req: User = Depends(verify_token)):
     user = session.query(User).filter(User.id == user_id).first()

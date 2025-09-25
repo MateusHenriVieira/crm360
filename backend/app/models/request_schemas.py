@@ -31,3 +31,12 @@ class LeadTeste(BaseModel):
     avatar: Optional[bytes]
     class Config:
         from_attributes = True
+
+
+
+
+class SpecialtySchema(BaseModel):
+    name: str
+    description: str
+    class Config:
+        from_attributes = True

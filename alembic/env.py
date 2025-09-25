@@ -24,6 +24,7 @@ if config.config_file_name is not None:
 from backend.app.models.db import Base
 from backend.app.models.user import User
 from backend.app.models.lead import Lead
+from backend.app.models.speciality import Specialty
 
 
 

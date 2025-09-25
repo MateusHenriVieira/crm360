@@ -1,14 +1,20 @@
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
+from backend.app.models.speciality import Specialty
 
 
+
+
+class SpecialtyModel(BaseModel):
+    name: str
 class ResponseLead(BaseModel):
     id: int
     name: str
     email: str
     phone: Optional[str]
     specialty_id: int
+    speciality: SpecialtyModel
     status: str
     score: float
     source: str
