@@ -24,8 +24,9 @@ class Lead(Base):
     name = Column(String, nullable=False)
     email = Column(String, unique=True, index=True)
     phone = Column(String, nullable=False)
-    specialty_id = Column(Integer, ForeignKey("specialties.id"))
+    speciality_id = Column(Integer, ForeignKey("specialties.id"))
     speciality = relationship("Specialty", back_populates="leads")
+    appointments = relationship("Appointment", back_populates="lead")
     status = Column(String, default=LeadStatus.NOVO)  # novo, qualificado, agendado, convertido, perdido
     score = Column(Float, default=0.0)  # Lead scoring IA
     source = Column(String)  # whatsapp, instagram, facebook, google, email
@@ -40,11 +41,11 @@ class Lead(Base):
 
 
 
-    def __init__(this, name, email, specialty_id, status, score, source, avatar=None, phone=None):
+    def __init__(this, name, email, speciality_id, status, score, source, avatar=None, phone=None):
         this.name = name
         this.email = email
         this.phone = phone
-        this.specialty_id = specialty_id
+        this.speciality_id = speciality_id
         this.status = status
         this.score = score
         this.source = source
@@ -57,7 +58,7 @@ class Lead(Base):
     
 
 
-    def advance_stage(self, next_stage: str):
+    def advance_stage(this, next_stage: str):
 
         valid_stages = ["novo", "qualificado", "agendado", "convertido", "perdido"]
 
@@ -65,17 +66,17 @@ class Lead(Base):
 
             raise ValueError(f"Stage inválido: {next_stage}")
         
-        self.status = next_stage
+        this.status = next_stage
 
-        self.updated_at = datetime.utcnow()
+        this.updated_at = datetime.utcnow()
 
-    def mark_lost(self):
+    def mark_lost(this):
 
-        self.status = "perdido"
+        this.status = "perdido"
 
-        self.updated_at = datetime.utcnow()
+        this.updated_at = datetime.utcnow()
 
-    def is_stage(self, stage_name: str) -> bool:
-        return self.status == stage_name
+    def is_stage(this, stage_name: str) -> bool:
+        return this.status == stage_name
     
 

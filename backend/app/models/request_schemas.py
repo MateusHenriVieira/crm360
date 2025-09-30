@@ -22,7 +22,7 @@ class LeadTeste(BaseModel):
     name: str
     email: str
     phone: Optional[str]
-    specialty_id: int
+    speciality_id: int
     status: str
     score: float
     source: str
@@ -40,3 +40,11 @@ class SpecialtySchema(BaseModel):
     description: str
     class Config:
         from_attributes = True
+
+
+
+class AppoTeste(BaseModel):
+    lead_id: int
+    speciality_id: int
+    scheduled_date: datetime
+    notes: Optional[str]

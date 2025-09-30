@@ -15,13 +15,13 @@ lead_router = APIRouter(prefix="/api/leads", tags=["leads"])
 
 
 
-@lead_router.get("/", response_model=List[ResponseLead])
-async def get_leads(skip: int = 0, limit: int = 100, specialty_id: Optional[int] = None, status: Optional[str] = None, session: Session = Depends(get_session_db), user_req: User = Depends(verify_token)):
+@lead_router.get("", response_model=List[ResponseLead])
+async def get_leads(skip: int = 0, limit: int = 100, speciality_id: Optional[int] = None, status: Optional[str] = None, session: Session = Depends(get_session_db), user_req: User = Depends(verify_token)):
     """Buscar leads com filtros"""
     query = session.query(Lead)
     
-    if specialty_id:
-        query = query.filter(Lead.specialty_id == specialty_id)
+    if speciality_id:
+        query = query.filter(Lead.speciality_id == speciality_id)
     if status:
         query = query.filter(Lead.status == status)
     
@@ -31,9 +31,9 @@ async def get_leads(skip: int = 0, limit: int = 100, specialty_id: Optional[int]
 
 
 @lead_router.get("/by-specialty/{specialty}", response_model=List[ResponseLead])
-async def get_leads_by_especiality(specialty: int, skip: int = 0, limit: int = 100, session: Session = Depends(get_session_db), user_req: User = Depends(verify_token)):
+async def get_leads_by_especiality(speciality: int, skip: int = 0, limit: int = 100, session: Session = Depends(get_session_db), user_req: User = Depends(verify_token)):
     query = session.query(Lead)
-    leads = query.filter(Lead.specialty_id == specialty).offset(skip).limit(limit).all()
+    leads = query.filter(Lead.speciality_id == speciality).offset(skip).limit(limit).all()
     return leads
 
 
@@ -42,7 +42,7 @@ async def get_leads_by_especiality(specialty: int, skip: int = 0, limit: int = 1
 
 @lead_router.post("/internal/create-speciality")
 async def create_speciality(spec_data: SpecialtySchema, session: Session = Depends(get_session_db), user_req: User = Depends(verify_token)):
-    if user_req.id != 1:
+    if user_req.super_admin == False:
         raise HTTPException(status_code=401, detail=f"user {user_req.name} não está autorizado a criar novas especialidades")
     new_speciality = Specialty(spec_data.name, spec_data.description)
     flag_spec = session.query(Specialty).filter(Specialty.name == spec_data.name).first()

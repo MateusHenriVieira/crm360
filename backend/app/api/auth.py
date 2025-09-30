@@ -50,7 +50,7 @@ async def set_admin_account(user_id: int, adm: bool, session: Session = Depends(
     user = session.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="usuario nao encontrado")
-    if user_req.id != 1 and user.admin == True:
+    if user_req.super_admin == False:
         raise HTTPException(status_code=401, detail=f"usuario {user_req.name} não autorizado")
     if adm:
         user.admin = True

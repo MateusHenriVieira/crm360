@@ -12,9 +12,11 @@ class User(Base):
     email = Column("email", String, nullable=False)
     password = Column("password", String, nullable=False)
     admin = Column("admin", Boolean, nullable=False, default=False)
+    super_admin = Column("superadmin", Boolean, nullable=False, default=False)
 
-    def __init__(this, name, email, password, admin=False):
+    def __init__(this, name, email, password, admin=False, super_admin=False):
         this.name = name
         this.email = email
         this.password = password
         this.admin = admin
+        this.super_admin = super_admin

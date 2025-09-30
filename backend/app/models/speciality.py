@@ -11,7 +11,7 @@ class Specialty(Base):
     name = Column(String, unique=True, nullable=False)
     description = Column(Text)
     color = Column(String, default="#64748b")
-    leads = relationship("Lead", back_populates="speciality")
+    leads = relationship("Lead")
 
     def __init__(this, name, description):
         this.name = name
